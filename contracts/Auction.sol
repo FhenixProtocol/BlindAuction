@@ -20,14 +20,6 @@ contract Auction {
     euint32 internal eMaxEuint32;
     uint256 public auctionEndTime;
 
-    // mapping(address => euint32) public auctionHistory;
-    // euint32 public ezero;
-    // euint32 public highestBid;
-    // Eaddress internal defaultAddress;
-    // Eaddress internal highestBidder;
-    // euint32 public eMaxEuint32;
-    // uint256 public auctionEndTime;
-
     // When auction is ended this will contain the PLAINTEXT winner address
     address public winnerAddress;
 
@@ -90,7 +82,7 @@ contract Auction {
 
     function endAuction() public {
         require(msg.sender == auctioneer, "Only auctioneer can end the auction");
-        // require(block.timestamp >= auctionEndTime, "Auction has not ended yet");
+        require(block.timestamp >= auctionEndTime, "Auction has not ended yet");
         require(!wasEnded(), "Auction already ended");
         winnerAddress = ConfAddress.unsafeToAddress(highestBidder);
         // The cards can be revealed now, we can safely reveal the bidder
@@ -102,6 +94,7 @@ contract Auction {
         require(winnerAddress != msg.sender, "A winner can't redeem his bid");
         require(!auctionHistory[msg.sender].refunded, "Already refunded");
 
+        // This decrypt won't really happen when using WERC20
         uint32 bidAmount = FHE.decrypt(auctionHistory[msg.sender].amount);
 
         require(bidAmount != 0, "Nothing to refund");
