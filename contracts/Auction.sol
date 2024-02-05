@@ -2,7 +2,8 @@
 
 pragma solidity >=0.8.13 <0.9.0;
 
-import { euint32, FHE } from "@fhenixprotocol/contracts/FHE.sol";
+import { inEuint32, euint32, FHE } from "@fhenixprotocol/contracts/FHE.sol";
+import { WrappingERC20 } from "./wERC20.sol";
 import "./ConfAddress.sol";
 
 struct HistoryEntry {
@@ -19,13 +20,15 @@ contract Auction {
     Eaddress internal highestBidder;
     euint32 internal eMaxEuint32;
     uint256 public auctionEndTime;
+    WrappingERC20 internal _wfhenix;
 
     // When auction is ended this will contain the PLAINTEXT winner address
     address public winnerAddress;
 
     event AuctionEnded(address winner, uint32 bid);
 
-    constructor(uint256 biddingTime) payable {
+    constructor(address wfhenix, uint256 biddingTime) payable {
+        _wfhenix = WrappingERC20(wfhenix);
         auctioneer = payable(msg.sender);
         auctionEndTime = block.timestamp + biddingTime;
         ezero = FHE.asEuint32(0);
@@ -38,7 +41,7 @@ contract Auction {
         eMaxEuint32 = FHE.asEuint32(0xFFFFFFFF);
     }
 
-    function updateHistory(address payable addr, euint32 currentBid) internal returns (euint32) {
+    function updateHistory(address addr, euint32 currentBid) internal returns (euint32) {
         // Check for overflow, if such, just don't change the actualBid
         // NOTE: overflow is most likely an abnormal action so the funds WON'T be refunded!
         if (!FHE.isInitialized(auctionHistory[addr].amount)) {
@@ -59,11 +62,16 @@ contract Auction {
         return auctionHistory[addr].amount;
     }
 
-    function bid() public payable {
+    function bid(inEuint32 calldata amount) public {
         require(block.timestamp <= auctionEndTime, "Auction has ended");
-        require((msg.value / (10 ** 18)) < 0xFFFFFFFF, "Max bid is 4294967295wei");
 
-        euint32 newBid = updateHistory(payable(msg.sender), FHE.asEuint32((msg.value / (10 ** 18))));
+        euint32 prevBalance = _wfhenix.balanceOfEncrypyedRaw();
+        _wfhenix.transferFrom(msg.sender, address(this), amount);
+        euint32 postBalance = _wfhenix.balanceOfEncrypyedRaw();
+
+        euint32 totalAmount = postBalance - prevBalance;
+
+        euint32 newBid = updateHistory(msg.sender, totalAmount);
         // Can't update here highestBid directly because we need and indication whether the highestBid was changed
         // if we will change here the highestBid
         // we will have an edge case when the current bid will be equal to the highestBid
