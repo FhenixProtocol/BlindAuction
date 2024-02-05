@@ -64,16 +64,10 @@ contract Auction {
         require((msg.value / (10 ** 18)) < 0xFFFFFFFF, "Max bid is 4294967295wei");
 
         euint32 newBid = updateHistory(payable(msg.sender), FHE.asEuint32((msg.value / (10 ** 18))));
-        // Can't update here highestBid directly because we need and indication whether the highestBid was changed
-        // if we will change here the highestBid
-        // we will have an edge case when the current bid will be equal to the highestBid
-        euint32 newHeighestBid = FHE.max(newBid, highestBid);
 
-        Eaddress memory eaddr = ConfAddress.toEaddress(payable(msg.sender));
-        ebool wasBidChanged = newHeighestBid.gt(highestBid);
-
-        highestBidder = ConfAddress.conditionalUpdate(wasBidChanged, highestBidder, eaddr);
-        highestBid = newHeighestBid;
+        // Hello workshop
+        // Update highest bidder
+        // Update highest bid
     }
 
     function wasEnded() internal view returns (bool) {
