@@ -11,9 +11,9 @@ import "./BytesLib.sol";
 
 /// @dev A representation of an encrypted address using Fully Homomorphic Encryption.
 /// It consists of 5 encrypted 32-bit unsigned integers (`euint32`).
-struct Eaddress {
-    euint32[5] values;
-}
+    struct Eaddress {
+        euint32[5] values;
+    }
 
 library ConfAddress {
     /// @notice Encrypts a plaintext Ethereum address into its encrypted representation (`eaddress`).
@@ -25,7 +25,7 @@ library ConfAddress {
         /// @dev A bitmask constant for selecting specific 32-bit chunks from a 160-bit Ethereum address.
         /// It has the first 32 bits set to 1, and the remaining bits set to 0.
         uint160 MASK =
-            uint160(uint256(0x000000000000000000000000FFFFFFFF00000000000000000000000000000000));
+                            uint160(uint256(0x000000000000000000000000FFFFFFFF00000000000000000000000000000000));
 
         Eaddress memory eaddr;
 
