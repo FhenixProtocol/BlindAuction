@@ -9,7 +9,6 @@ error ErrorInsufficientFunds();
 error ERC20InvalidApprover(address);
 error ERC20InvalidSpender(address);
 
-
 contract WrappingERC20 is ERC20, Permissioned {
     // A mapping from address to an encrypted balance.
     mapping(address => euint32) internal _encBalances;
@@ -58,11 +57,11 @@ contract WrappingERC20 is ERC20, Permissioned {
         return spent;
     }
 
-    function transferFrom(address from, address to, inEuint32 calldata value) public virtual returns (bool) {
+    function transferFromEncrypted(address from, address to, inEuint32 calldata value) public returns (euint32) {
         euint32 val = FHE.asEuint32(value);
         euint32 spent = _spendAllowance(from, msg.sender, val);
         _transferImpl(from, to, spent);
-        return true;
+        return spent;
     }
 
     function wrap(uint32 amount) public {
@@ -132,7 +131,7 @@ contract WrappingERC20 is ERC20, Permissioned {
     }
 
     function balanceOfRaw(bytes memory publicKey) public view returns (bytes memory) {
-         return FHE.sealoutput(_encBalances[msg.sender], bytes32(publicKey[:32]));
+        return FHE.sealoutput(_encBalances[msg.sender], bytes32(publicKey));
     }
 
     function getEncryptedTotalSupply(

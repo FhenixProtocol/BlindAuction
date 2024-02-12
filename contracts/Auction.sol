@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause-Clear
 
-pragma solidity >=0.8.13 <0.9.0;
+pragma solidity ^0.8.19;
 
 import { inEuint32, euint32, FHE } from "@fhenixprotocol/contracts/FHE.sol";
 import { WrappingERC20 } from "./wERC20.sol";
@@ -65,11 +65,7 @@ contract Auction {
     function bid(inEuint32 calldata amount) public {
         require(block.timestamp <= auctionEndTime, "Auction has ended");
 
-        euint32 prevBalance = _wfhenix.balanceOfEncrypyedRaw();
-        _wfhenix.transferFrom(msg.sender, address(this), amount);
-        euint32 postBalance = _wfhenix.balanceOfEncrypyedRaw();
-
-        euint32 totalAmount = postBalance - prevBalance;
+        euint32 totalAmount = _wfhenix.transferFromEncrypted(msg.sender, address(this), amount);
 
         euint32 newBid = updateHistory(msg.sender, totalAmount);
         // Can't update here highestBid directly because we need and indication whether the highestBid was changed

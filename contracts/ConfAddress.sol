@@ -3,7 +3,7 @@
 pragma solidity >=0.8.13 <0.9.0;
 
 import { euint32, ebool, FHE } from "@fhenixprotocol/contracts/FHE.sol";
-import "github.com/GNSPS/solidity-bytes-utils/contracts/BytesLib.sol";
+import "./BytesLib.sol";
 
 /// @title Encrypted Address Library
 /// @notice Provides methods for creating and managing addresses encrypted with FHE (Fully Homomorphic Encryption)
