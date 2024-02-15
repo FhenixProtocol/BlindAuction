@@ -3,7 +3,7 @@
 pragma solidity >=0.8.13 <0.9.0;
 
 import { euint32, ebool, FHE } from "@fhenixprotocol/contracts/FHE.sol";
-import "github.com/GNSPS/solidity-bytes-utils/contracts/BytesLib.sol";
+import "./BytesLib.sol";
 
 /// @title Encrypted Address Library
 /// @notice Provides methods for creating and managing addresses encrypted with FHE (Fully Homomorphic Encryption)
@@ -24,8 +24,7 @@ library ConfAddress {
         uint160 addrValue = uint160(address(addr));
         /// @dev A bitmask constant for selecting specific 32-bit chunks from a 160-bit Ethereum address.
         /// It has the first 32 bits set to 1, and the remaining bits set to 0.
-        uint160 MASK =
-            uint160(uint256(0x000000000000000000000000FFFFFFFF00000000000000000000000000000000));
+        uint160 MASK = uint160(uint256(0x000000000000000000000000FFFFFFFF00000000000000000000000000000000));
 
         Eaddress memory eaddr;
 
@@ -54,7 +53,7 @@ library ConfAddress {
 
         bytes memory addrBz = new bytes(32);
         assembly {
-            mstore(add(addrBz,32), addrValue)
+            mstore(add(addrBz, 32), addrValue)
         }
 
         return BytesLib.toAddress(addrBz, 12);
