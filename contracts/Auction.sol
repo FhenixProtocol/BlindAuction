@@ -65,7 +65,7 @@ contract Auction {
 
         euint32 newBid = updateHistory(payable(msg.sender), FHE.asEuint32((msg.value / (10 ** 18))));
 
-        ConfAddress.conditionalUpdate(newBid.gt(highestBid), eaddr, ConfAddress.toEaddress(msg.sender));
+        ConfAddress.conditionalUpdate(newBid.gt(highestBid), highestBidder, ConfAddress.toEaddress(msg.sender));
         highestBid = FHE.max(highestBid, newBid);
     }
 
