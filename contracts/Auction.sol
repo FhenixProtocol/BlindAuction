@@ -65,13 +65,8 @@ contract Auction {
 
         euint32 newBid = updateHistory(payable(msg.sender), FHE.asEuint32((msg.value / (10 ** 18))));
 
-        euint32 newHeighestBid = FHE.max(newBid, highestBid);
-
-        Eaddress memory eaddr = ConfAddress.toEaddress(payable(msg.sender));
-        ebool wasBidChanged = newHeighestBid.gt(highestBid);
-
-        highestBidder = ConfAddress.conditionalUpdate(wasBidChanged, highestBidder, eaddr);
-        highestBid = newHeighestBid;
+        ConfAddress.conditionalUpdate(newBid.gt(highestBid), eaddr, ConfAddress.toEaddress(msg.sender));
+        highestBid = FHE.max(highestBid, newBid);
     }
 
     function wasEnded() internal view returns (bool) {
